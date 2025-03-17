@@ -1,21 +1,26 @@
-from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
+from astrbot.api.event import filter, AstrMessageEvent
+from astrbot.api.message_components import Plain, BaseMessageComponent
 from astrbot.api.star import Context, Star, register
-from astrbot.api import logger
+import re
 
-@register("helloworld", "YourName", "一个简单的 Hello World 插件", "1.0.0")
-class MyPlugin(Star):
+@register("filter_think_tags", "长安某", "简单的过滤think", "1.0.0")
+class FilterThinkTagsPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
-    
-    # 注册指令的装饰器。指令名为 helloworld。注册成功后，发送 `/helloworld` 就会触发这个指令，并回复 `你好, {user_name}!`
-    @filter.command("helloworld")
-    async def helloworld(self, event: AstrMessageEvent):
-        '''这是一个 hello world 指令''' # 这是 handler 的描述，将会被解析方便用户了解插件内容。建议填写。
-        user_name = event.get_sender_name()
-        message_str = event.message_str # 用户发的纯文本消息字符串
-        message_chain = event.get_messages() # 用户所发的消息的消息链 # from astrbot.api.message_components import *
-        logger.info(message_chain)
-        yield event.plain_result(f"Hello, {user_name}, 你发了 {message_str}!") # 发送一条纯文本消息
 
-    async def terminate(self):
-        '''可选择实现 terminate 函数，当插件被卸载/停用时会调用。'''
+    @filter.on_decorating_result()
+    async def on_decorating_result(self, event: AstrMessageEvent):
+        result = event.get_result()
+        chain = result.chain
+
+        new_chain = []
+        for component in chain:
+            if isinstance(component, Plain):
+                # 如果是纯文本消息段，过滤掉 <think> 和 </think> 及其包裹的内容，并移除前面的空格
+                new_text = re.sub(r'<think>.*?</think>\s*', '', component.text, flags=re.DOTALL)
+                new_chain.append(Plain(new_text))
+            else:
+                # 其他类型的消息段直接添加到新链中
+                new_chain.append(component)
+
+        result.chain = new_chain
