@@ -1,8 +1,5 @@
-# helloworld
+# 简单的过滤think标签以及空格
 
-AstrBot 插件模板
-
-A template plugin for AstrBot plugin feature
 
 # 支持
 
