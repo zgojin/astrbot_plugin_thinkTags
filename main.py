@@ -3,7 +3,7 @@ from astrbot.api.message_components import Plain, BaseMessageComponent
 from astrbot.api.star import Context, Star, register
 import re
 
-@register("filter_think_tags", "长安某", "过滤think/thinking标签", "1.1.0")
+@register("filter_think_tags", "长安某", "过滤think/thinking/disclaimer标签", "1.0.0")
 class FilterThinkTagsPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
@@ -16,14 +16,14 @@ class FilterThinkTagsPlugin(Star):
         new_chain = []
         for component in chain:
             if isinstance(component, Plain):
-                # 匹配 <think>...</think> 或 <thinking>...</thinking> 及其包裹的内容
+                # 匹配 <think>...</think>、<thinking>...</thinking> 或 <disclaimer>...</disclaimer> 及其包裹的内容
                 new_text = re.sub(
-                    r'<(think|thinking)>.*?</\1>\s*',
+                    r'<(think|thinking|disclaimer)>.*?</\1>\s*',
                     '',
                     component.text,
                     flags=re.DOTALL
                 )
-                #过滤无标签的纯文本 "Thinking: ..."
+                # 过滤无标签的纯文本 "Thinking: ..."
                 new_text = re.sub(r'Thinking:\s*.*?(\n|$)', '', new_text, flags=re.DOTALL)
                 new_chain.append(Plain(new_text.strip()))  # 移除首尾空格
             else:
