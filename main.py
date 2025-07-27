@@ -3,7 +3,7 @@ from astrbot.api.message_components import Plain, BaseMessageComponent
 from astrbot.api.star import Context, Star, register
 import re
 
-@register("filter_think_tags", "长安某", "过滤think/thinking/disclaimer标签", "1.2.0")
+@register("astrbot_plugin_thinkTags", "长安某", "过滤think/thinking/disclaimer标签", "1.2.0")
 class FilterThinkTagsPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
