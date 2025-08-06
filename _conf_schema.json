@@ -1,0 +1,18 @@
+{
+  "filtered_tags": {
+    "type": "list",
+    "description": "要过滤标签列表",
+    "hint": "在此处添加您希望从机器人回复中移除的标签名，例如 'think'。注意：只需填写标签名，不需要填写尖括号 < >。",
+    "default": [
+      "think",
+      "thinking",
+      "disclaimer"
+    ]
+  },
+  "filter_thinking_pattern": {
+    "type": "bool",
+    "description": "是否过滤 'Thinking: ...' 这种无标签的思考过程文本",
+    "hint": "如果勾选，插件会移除以 'Thinking:' 开头的独立文本行。",
+    "default": true
+  }
+}
