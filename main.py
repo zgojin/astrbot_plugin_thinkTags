@@ -4,8 +4,8 @@ from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.message_components import Plain
 from astrbot.api.star import Context, Star, register
 
-@register("astrbot_plugin_thinktags", "长安某", "自定义过滤思考内容", "1.3.0")
-class FilterthinktagsPlugin(Star):
+@register("astrbot_plugin_thinkTags", "长安某", "过滤标签和文本", "1.3.0")
+class FilterThinkTagsPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
         # 将传入的配置对象保存在插件实例中
@@ -16,10 +16,9 @@ class FilterthinktagsPlugin(Star):
         result = event.get_result()
         chain = result.chain
 
-        # 从配置中读取要过滤的标签列表和开关状态
-        # .get() 方法可以提供默认值，防止配置不存在时出错
+        # 从配置中读取两个列表，如果配置不存在则使用空列表作为默认值
         tags_to_filter = self.config.get('filtered_tags', [])
-        should_filter_pattern = self.config.get('filter_thinking_pattern', True)
+        prefixes_to_filter = self.config.get('filtered_prefixes', [])
 
         new_chain = []
         for component in chain:
@@ -27,19 +26,19 @@ class FilterthinktagsPlugin(Star):
             if isinstance(component, Plain):
                 new_text = component.text
                 
-                # 根据标签列表动态生成正则表达式并执行过滤
-                # 仅在配置列表不为空时执行
+
+                # 根据标签列表动态过滤标签
                 if tags_to_filter:
-                    # 使用'|'连接所有标签名，构建正则表达式
-                    # re.escape()可以防止用户输入的标签名包含特殊正则字符而导致错误
                     tag_group = '|'.join(re.escape(tag) for tag in tags_to_filter)
-                    # 生成最终的匹配模式
                     pattern = rf'<({tag_group})>.*?</\1>\s*'
                     new_text = re.sub(pattern, new_text, flags=re.DOTALL)
 
-                # 根据开关状态决定是否过滤 "Thinking: ..." 文本
-                if should_filter_pattern:
-                    new_text = re.sub(r'Thinking:\s*.*?(\n|$)', '', new_text, flags=re.DOTALL)
+                # 过滤无标签的、可能跨行的文本块
+                if prefixes_to_filter:
+                    for prefix in prefixes_to_filter:
+                        pattern = rf'^{re.escape(prefix)}.*?(\n\n|\Z)'
+                        # 使用 re.DOTALL (让.匹配换行符) 和 re.MULTILINE (让^匹配每行开头)
+                        new_text = re.sub(pattern, '', new_text, flags=re.DOTALL | re.MULTILINE)
                 
                 # 清理文本两端的空白字符
                 stripped_text = new_text.strip()
