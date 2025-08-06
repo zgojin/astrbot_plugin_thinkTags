@@ -4,5 +4,4 @@
 # 更新
 - 1.1 修改metaw文档 增加thinking过滤
 - 1.2增加disclaimer过滤
-
-[帮助文档](https://astrbot.app)
+- 1.3 允许通过控制面板手动添加需要过滤的标签
