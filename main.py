@@ -4,7 +4,7 @@ from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.message_components import Plain
 from astrbot.api.star import Context, Star, register
 
-@register("astrbot_plugin_thinkTags", "长安某", "过滤标签和文本", "1.3.0")
+@register("astrbot_plugin_thinktags", "长安某", "过滤标签和文本", "1.3.0")
 class FilterThinkTagsPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
